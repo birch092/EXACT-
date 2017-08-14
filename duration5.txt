@@ -1,0 +1,96 @@
+
+
+;File names that will hold the data
+fn1='C:\Users\Cameron\Downloads\b_duration.dat'
+fn2='C:\Users\Cameron\Downloads\c_duration.dat'
+fn3='C:\Users\Cameron\Downloads\m_duration.dat'
+fn4='C:\Users\Cameron\Downloads\x_duration.dat'
+
+;Open/create the files
+OPENW,1,fn1
+OPENW,2,fn2
+OPENW,3,fn3
+OPENW,4,fn4
+
+
+;Ask user for initial and final dates
+;dd-mmm-yy == 01-jan-05 for example 
+time1 = '01-jan-03'
+time2 = '01-jan-07'
+;read, time1, prompt = 'Please provide the initial date you wish (dd-mmm-yy):'
+;read, time2, prompt = 'Please provide the final date you wish (dd-mmm-yy):'
+
+
+;Pull GOES flare list
+;/struct pulls it as a structure
+;/class_decode converts GOES class to flux
+a=ogoes()
+gev = a->get_gev(time1,time2,/struct,/class_decode)
+
+;Pulls the start and end times for the flare list
+start = gev.gstart
+finish =gev.gend
+
+;Convert from 
+start = anytim(start, /utime)
+finish = anytim(finish, /utime)
+
+		
+;Determine number of flares and create an array to hold the flare durations
+n = n_elements(start)
+duration = fltarr(n)
+
+;Calculate the duration of each flare
+duration = finish - start
+
+;Extract the GOES class information
+class = gev.class
+
+
+
+
+
+
+
+ ;Count holders for the flare classes
+count_b = 0
+count_c = 0
+count_m = 0
+count_x = 0
+
+
+ ; Plot duration verses class.
+myPlot = SCATTERPLOT(class, duration, /Xlog, /Ylog, $
+  SYMBOL = 'star', /SYM_FILLED, SYM_COLOR = 'green', $
+  XTITLE = 'Duration', $
+  YTITLE = 'Flux', $
+  TITLE = 'Duration vs Flux')
+  
+  ; Define an 11-element vector of independent variable data:
+X = Duration
+; Define an 11-element vector of dependent variable data:
+Y = Class
+; Define a vector of measurement errors: 
+
+; Compute the second degree polynomial fit to the data:
+result = POLY_FIT(Y, X, 2, $
+   SIGMA=sigma)
+; Print the coefficients:
+PRINT, 'Coefficients: ', result
+
+ 
+start_t = 10^2.
+end_t = 10^5.
+n = 10000
+
+step = float(n)/(end_t-start_t)
+
+time = MAKE_ARRAY(n, increment=step, /NOZERO, /INDEX, start=start_t)
+  
+func_class=result[0]*time^2 + result[1]*time + result[2]
+
+myplot=plot(time, func_class, overplot=1, SYM_COLOR='black')
+ 
+ 
+ 
+ 

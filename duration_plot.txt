@@ -1,0 +1,53 @@
+
+fn='C:\Users\Cameron\Downloads\goes_info3.txt'
+OPENR,1, fn
+info=dblarr(2, 2711)
+readf, 1, info
+
+;extract from data array
+class=info(0,*)
+duration=info(1,*)
+
+;Count holders for the flare classes
+count_b = 0
+count_c = 0
+count_m = 0
+count_x = 0
+
+;
+class=ALOG10(class)
+duration=ALOG10(duration)
+
+
+
+ ; Plot duration verses class.
+myPlot = SCATTERPLOT(class, duration, $
+  SYMBOL = 'star', /SYM_FILLED, SYM_COLOR = 'green', $
+  XTITLE = 'Duration', $
+  YTITLE = 'Flux', $
+  TITLE = 'Duration vs Flux')
+ 
+  
+  ;perform 3-order polynomial fit
+ coeff=poly_fit(class, duration, 1,yfit=yfit ,/double )
+ 
+
+ ;set up for testing poly_fit
+ n=100
+ start=1.e-7
+ finish=10e-4
+ 
+ 
+ 
+ class_input=alog10(findgen(n) * (10.^start-10.^start)/(n-1) +10.^finish)
+ 
+ dur_output=coeff[0]*(class_input^2.) + coeff[1]*class_input + coeff[2]
+ 
+ ;() for math and functions, [] are for calling elements in array
+ 
+ 
+ ;p=plot(class_input, dur_output, overplot=1, SYM_COLOR='purple')
+ 
+ rad_loss,temperature,loss_rate
+ rad_loss,1000
+ 

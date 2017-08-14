@@ -1,0 +1,45 @@
+
+fn='C:\Users\Cameron\Downloads\goes_info3.txt'
+OPENR,1 fn
+info=fltarr(2, 2711)
+readf, 1, info
+
+;Count holders for the flare classes
+count_b = 0
+count_c = 0
+count_m = 0
+count_x = 0
+
+ ; Plot duration verses class.
+myPlot = SCATTERPLOT(duration, class, /Xlog, /Ylog, $
+  SYMBOL = 'star', /SYM_FILLED, SYM_COLOR = 'green', $
+  XTITLE = 'Duration', $
+  YTITLE = 'Flux', $
+  TITLE = 'Duration vs Flux')
+  
+  ; Define an 11-element vector of independent variable data:
+X = Duration
+; Define an 11-element vector of dependent variable data:
+Y = Class
+; Define a vector of measurement errors: 
+
+; Compute the second degree polynomial fit to the data:
+result = POLY_FIT(Y, X, 2, $
+   SIGMA=sigma)
+; Print the coefficients:
+PRINT, 'Coefficients: ', result
+
+ 
+start_t = 10^2.
+end_t = 10^5.
+n = 10000
+
+step = float(n)/(end_t-start_t)
+
+time = MAKE_ARRAY(n, increment=step, /NOZERO, /INDEX, start=start_t)
+  
+func_class=(-5.97)*(10^(-7))*time^2 + (7.94*10^(-9))*time + (-3.38)*10^(-13)
+
+myplot=plot(time, func_class, overplot=1, SYM_COLOR='red')
+ 
+ 
